@@ -1,0 +1,13 @@
+Package: CereNet
+Type: Package
+Title: Cerebellum-Inspired Network Diffusion for Spatial & Single-Cell Omics
+Version: 0.1.0
+Authors@R: 
+    person(given = "Deepa", family = "Bedi",
+           email = "you@example.com", role = c("aut", "cre"))
+Description: Iterative reward-injection and multi-signal feedback diffusion on arbitrary graphs.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+
