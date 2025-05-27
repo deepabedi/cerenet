@@ -45,9 +45,6 @@ remotes::install_github("deepabedi/CereNet", ref = "dev", repos = BiocManager::r
 
 ## Usage
 
-
-## Usage
-
 ```r
 # Load the package
 library(CereNet)
