@@ -22,7 +22,8 @@ Imports:
     viridis,
     igraph,
     dplyr,
-    methods
+    methods,
+    Matrix
 Suggests:
     testthat (>= 3.0.0),
     BiocCheck
