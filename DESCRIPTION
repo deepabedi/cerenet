@@ -29,4 +29,3 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 7.3.2
-
