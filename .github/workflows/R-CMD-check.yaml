@@ -1,7 +1,7 @@
 # .github/workflows/R-CMD-check.yaml
 
 # This workflow uses actions that are not certified by GitHub.
-# They are provided by a third‐party and are governed by
+# They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support documentation.
 #
 # See https://github.com/r-lib/actions/tree/master/examples#readme for
@@ -19,27 +19,38 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  R-CMD-check:
     runs-on: macos-latest
 
+    # Only run on R versions that exist and satisfy Seurat ≥ 4.4
     strategy:
       matrix:
-        r-version: [ "4.1.1", "4.2.2" ]
+        r-version: [ "4.2.2", "4.3.3" ]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up R ${{ matrix.r-version }}
-        uses: r-lib/actions/setup-r@f57f1301a053485946083d7a45022b278929a78a
+        uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.r-version }}
 
-      - name: Install dependencies
+      - name: Install system dependencies
+        run: |
+          # (On macOS runners, openssl and httpuv will be available automatically,
+          #  but if you need any system libraries you can install them here.)
+          brew update
+          brew install pkg-config # ensure pkg-config is up-to-date
+        shell: bash
+
+      - name: Install R package dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
 
-      - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+      - name: Run R CMD check
+        run: |
+          rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
         shell: Rscript {0}
