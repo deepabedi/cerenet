@@ -1,72 +1,110 @@
 name: R-CMD-check
 
-# Trigger on pushes and pull requests to main
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
+    branches: [ "main" ]
+
+permissions:
+  contents: read
 
 jobs:
   R-CMD-check:
-    # We run on Ubuntu so that CRAN packages (Seurat, igraph, Matrix, etc.)
-    # install without the Mac-specific pkgconf issues you saw.
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        # Only test on R versions that can install Seurat >= 4.4
         r-version: [ "4.2.2", "4.3.3" ]
 
     steps:
-      # 1) Check out your repository
       - name: Check out repository
         uses: actions/checkout@v3
 
-      # 2) Set up the specified R version
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with:
-          # This picks R 4.2.2 on the first run, 4.3.3 on the second run.
           r-version: ${{ matrix.r-version }}
 
-      # 3) Install system‐level dependencies needed by CRAN/Bioconductor packages.
-      #    - libxml2-dev: for XML parsing
-      #    - libssl-dev:  for https
-      #    - libcurl4-openssl-dev: for HTTP/HTTPS support
       - name: Install system libraries
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y \
             libxml2-dev \
             libssl-dev \
-            libcurl4-openssl-dev
+            libcurl4-openssl-dev \
+            gfortran \
+            build-essential
 
-      # 4) (Optional) Install base Bioconductor to satisfy any Bioconductor-only Suggests.
-      #    If you have removed all Bioc packages from Suggests, you can comment out or delete this step.
-      - name: Set up Bioconductor
+      - name: (Optional) Set up Bioconductor
         run: |
           Rscript -e 'install.packages("BiocManager", repos="https://cloud.r-project.org")'
-          Rscript -e 'BiocManager::install()' 
+          Rscript -e 'BiocManager::install()'
 
-      # 5) Install all R package dependencies (Imports + Depends + Suggests)
       - name: Install R package dependencies
         run: |
           Rscript -e 'install.packages("remotes", repos="https://cloud.r-project.org")'
           Rscript -e 'remotes::install_deps(dependencies = TRUE)'
 
-      # 6) Run R CMD check
+      - name: Run R CMD check
+        run: |
+         name: R-CMD-check
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  R-CMD-check:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        r-version: [ "4.2.2", "4.3.3" ]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.r-version }}
+
+      - name: Install system libraries
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            libxml2-dev \
+            libssl-dev \
+            libcurl4-openssl-dev \
+            gfortran \
+            build-essential
+
+      - name: (Optional) Set up Bioconductor
+        run: |
+          Rscript -e 'install.packages("BiocManager", repos="https://cloud.r-project.org")'
+          Rscript -e 'BiocManager::install()'
+
+      - name: Install R package dependencies
+        run: |
+          Rscript -e 'install.packages("remotes", repos="https://cloud.r-project.org")'
+          Rscript -e 'remotes::install_deps(dependencies = TRUE)'
+
       - name: Run R CMD check
         run: |
           R CMD check --no-manual --as-cran .
 
-      # 7) If R CMD check fails, upload the Rcheck folder as an artifact for debugging
-   - name: Upload check results
-     if: always()
-     uses: actions/upload-artifact@v3
-     with:
-       name: cerenet-r-check-results
-       path: cereNet.Rcheck/**
+      # If you want to upload artifacts after errors, uncomment below:
+      # - name: Upload check results
+      #   if: always()
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: cerenet-r-check-results
+      #     path: cereNet.Rcheck/**
 
