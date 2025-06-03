@@ -63,10 +63,10 @@ jobs:
           R CMD check --no-manual --as-cran .
 
       # 7) If R CMD check fails, upload the Rcheck folder as an artifact for debugging
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: cerenet-r-check-results
-          path: cereNet.Rcheck
+   - name: Upload check results
+     if: always()
+     uses: actions/upload-artifact@v3
+     with:
+       name: cerenet-r-check-results
+       path: cereNet.Rcheck/**
 
