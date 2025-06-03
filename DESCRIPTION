@@ -9,6 +9,7 @@ Authors@R:
       email  = "dbedi@tuskegee.edu",
       role   = c("aut", "cre")
     )
+Maintainer: Deepa Bedi <dbedi@tuskegee.edu>
 Description: Iterative reward-injection and multi-signal feedback diffusion on
   arbitrary graphs.
 License: MIT + file LICENSE
@@ -28,3 +29,4 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 7.3.2
+
