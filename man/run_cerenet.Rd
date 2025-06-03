@@ -2,17 +2,68 @@
 % Please edit documentation in R/run_cerenet.R
 \name{run_cerenet}
 \alias{run_cerenet}
-\title{One-liner to run CereNet on a Visium folder}
+\title{Run the Full CERE-Net Pipeline}
 \usage{
-run_cerenet(path, modules, n_iter = 5)
+run_cerenet(
+  seurat_obj,
+  signal_vector,
+  graph,
+  alpha = 0.5,
+  n_iter = 10,
+  plot_feat = NULL,
+  pt_size = 1,
+  colormap = "viridis"
+)
 }
 \arguments{
-\item{path}{Folder with 10x Visium files (outs/).}
+\item{seurat_obj}{A \code{\link[Seurat]{Seurat}} object containing spatial data loaded.}
 
-\item{modules}{Named list: each element is a gene vector.}
+\item{signal_vector}{A named numeric vector of length = \code{ncol(seurat_obj)}, where names match
+spot IDs (i.e., \code{colnames(seurat_obj)}). These are the raw scores.}
 
-\item{n_iter}{Diffusion iterations (default 5).}
+\item{graph}{A sparse adjacency matrix (class \code{dgCMatrix}) or \code{igraph} object
+encoding spot-to-spot connectivity. Must match the spots in \code{seurat_obj}.}
+
+\item{alpha}{Numeric between 0 and 1; damping factor for propagation (default = 0.5).}
+
+\item{n_iter}{Integer; number of propagation iterations (default = 10).}
+
+\item{plot_feat}{Character (optional). Name of the feature in \code{@meta.data} to plot after
+propagation (e.g. \code{"signal_coord"}). If \code{NULL}, no plot is generated.}
+
+\item{pt_size}{Numeric; point size for the spatial plot (default = 1.0).}
+
+\item{colormap}{Character; name of a viridis palette for plotting (default = "viridis").}
+}
+\value{
+A list with components:
+\itemize{
+\item{\code{seurat_obj}}{The input Seurat object, now with these new \code{@meta.data} columns:}
+\itemize{
+\item{\code{signal_raw}}{the original \code{signal_vector} repeated per-spot.}
+\item{\code{signal_coord}}{the propagated (coordination) score per spot.}
+\item{\code{<raw>_coord}}{Spearman ρ per raw/propagated pair (e.g. \code{"signal_raw_coord"}).}
+}
+\item{\code{plot}}{A \code{\link[ggplot2]{ggplot}} object of \code{plot_feat}, or \code{NULL} if no plot requested.}
+\item{\code{rho_values}}{A named numeric vector of the Spearman ρ values for each \code{raw_col}.}
+}
 }
 \description{
-One-liner to run CereNet on a Visium folder
+This function takes a Seurat object, a named raw-signal vector, and a graph,
+then:
+\enumerate{
+\item Propagates the raw signal across the graph using \code{propagate_signal_sparse()}.
+\item Inserts raw and propagated scores into \code{@meta.data}.
+\item Computes Spearman coordination values with \code{compute_coordination()}.
+\item Optionally produces a ggplot of one specified feature.
+}
+}
+\details{
+Internally, this function calls:
+\itemize{
+\item \code{\link{propagate_signal_sparse}()} to get a numeric \code{signal_coord} vector.
+\item Writes \code{signal_raw} and \code{signal_coord} into \code{seurat_obj@meta.data}.
+\item Calls \code{\link{compute_coordination}()} to compute and store Spearman ρ for each raw/propagated pair.
+\item If \code{plot_feat} is not \code{NULL}, calls \code{\link{plot_cerenet_feature}()} to build a spatial plot.
+}
 }

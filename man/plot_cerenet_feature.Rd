@@ -2,22 +2,28 @@
 % Please edit documentation in R/plot_cerenet_feature.R
 \name{plot_cerenet_feature}
 \alias{plot_cerenet_feature}
-\title{Bright, high-contrast spatial map for a CereNet score}
+\title{Plot a CERE-Net Feature}
 \usage{
-plot_cerenet_feature(seurat, feature, palette = "inferno")
+plot_cerenet_feature(
+  seurat_obj,
+  feature_name,
+  pt_size = 1,
+  colormap = "viridis"
+)
 }
 \arguments{
-\item{seurat}{Seurat object returned by \code{run_cerenet()}}
+\item{seurat_obj}{A \code{\link[Seurat]{Seurat}} object containing spatial spots and metadata.}
 
-\item{feature}{Name of the column in \code{meta.data}
-(e.g. "Immune_PD11_prop", "Hypoxia1_prop")}
+\item{feature_name}{Character string naming the metadata column to plot (e.g. "signal_coord" or "signal_raw").}
 
-\item{palette}{Viridis palette ("inferno", "plasma", "magma", ...)}
+\item{pt_size}{Numeric; size of the points on the plot. Default is \code{1.0}.}
+
+\item{colormap}{Character vector of length \code{2} giving start and end colors (e.g. c("viridis::viridis(10)")). Default is \code{c("viridis")}.}
 }
 \value{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{   A ggplot2 object
-}\if{html}{\out{</div>}}
+A \code{\link[ggplot2]{ggplot}} object showing the spatial distribution of \code{feature_name}.
 }
 \description{
-Bright, high-contrast spatial map for a CereNet score
+Given a Seurat object with computed coordination (or raw feature) scores in \code{@meta.data}, this
+function produces a spatial scatter plot of any one feature (either raw or propagated) across spots.
 }

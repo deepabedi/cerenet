@@ -2,21 +2,38 @@
 % Please edit documentation in R/compute_coordination.R
 \name{compute_coordination}
 \alias{compute_coordination}
-\title{Compute Spearman coordination between raw and propagated signals}
+\title{Compute Spearman Coordination Between Raw and Propagated Signals}
 \usage{
 compute_coordination(seurat_obj, raw_cols, prop_cols)
 }
 \arguments{
-\item{seurat_obj}{A Seurat object with \code{raw_cols} and \code{prop_cols} in \verb{@meta.data}.}
+\item{seurat_obj}{A \code{\link[Seurat]{Seurat}} object. Its \code{@meta.data} must contain
+columns named in \code{raw_cols} and \code{prop_cols}.}
 
-\item{raw_cols}{Character vector of raw‐signal column names.}
+\item{raw_cols}{Character vector of column names (in \code{seurat_obj@meta.data}) that hold the
+raw signal values (e.g. \code{"signal_raw"}).}
 
-\item{prop_cols}{Character vector of propagated‐signal column names.}
+\item{prop_cols}{Character vector of column names (in \code{seurat_obj@meta.data}) that hold the
+propagated signal values (e.g. \code{"signal_coord"}). Must be the same length as
+\code{raw_cols}; each \code{prop_cols[i]} corresponds to \code{raw_cols[i]}.}
 }
 \value{
-The input Seurat object, augmented with \verb{\{raw\}_coord} columns.
+The same \code{\link[Seurat]{Seurat}} object, but with additional metadata columns.
+For each \code{raw_cols[i]}, a new column named \code{paste0(raw_cols[i], "_coord")}
+is created, containing the Spearman correlation ρ between raw and propagated values
+(repeated for every spot to make it easy to inspect).
 }
 \description{
-For each pair of raw/propagated columns, computes Spearman ρ and
-stores it in \verb{@meta.data} under \verb{\{raw\}_coord}.
+For each pair of raw/propagated columns in a Seurat object's metadata, computes the Spearman
+correlation (ρ) and stores it in a new metadata column named \verb{\{raw\}_coord}.
+}
+\details{
+This function loops over each index \code{i} in \code{seq_along(raw_cols)}, then:
+\enumerate{
+\item Extracts the raw vector \code{seurat_obj@meta.data[[ raw_cols[i] ]]}.
+\item Extracts the propagated vector \code{seurat_obj@meta.data[[ prop_cols[i] ]]}.
+\item Computes \code{rho <- cor(raw_vector, prop_vector, method="spearman", use="complete.obs")}.
+\item Stores \code{rho} in a new metadata column \code{paste0(raw_cols[i], "_coord")} of length
+\code{nrow(seurat_obj@meta.data)}, so that each spot has the same \code{rho} value.
+}
 }

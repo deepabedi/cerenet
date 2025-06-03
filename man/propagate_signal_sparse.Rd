@@ -2,30 +2,56 @@
 % Please edit documentation in R/propagate_signal_sparse.R
 \name{propagate_signal_sparse}
 \alias{propagate_signal_sparse}
-\title{Sparse-safe propagation of signals over a graph}
+\title{Propagate Signal Using a Sparse Connectivity Graph}
 \usage{
 propagate_signal_sparse(
   seurat_obj,
-  signal_cols,
+  initial_signal,
   graph,
-  alpha = 0.8,
-  n_iter = 5
+  n_iter = 10,
+  alpha = 0.5
 )
 }
 \arguments{
-\item{seurat_obj}{A Seurat object with raw signal columns in \verb{@meta.data}.}
+\item{seurat_obj}{A \code{\link[Seurat]{Seurat}} object containing spatial transcriptomics data.
+Must have spatial coordinates stored in \code{seurat_obj@meta.data}.}
 
-\item{signal_cols}{Character vector of column names in \verb{@meta.data} to propagate
-(e.g. the columns created by \code{AddModuleScore()}).}
+\item{initial_signal}{A numeric vector of length equal to the number of spots in \code{seurat_obj}.
+This vector holds the raw "mossy" signal for each spot. Order must match \code{colnames(seurat_obj)}.}
 
-\item{graph}{Sparse adjacency matrix (\code{dgCMatrix}) or \code{igraph} object
-matching the spots in \code{seurat_obj}.}
+\item{graph}{Either:
+\itemize{
+\item A sparse adjacency matrix (any \code{Matrix} package class, e.g. \code{dgCMatrix}, \code{ddiMatrix}, etc.),
+\item An \code{igraph} object encoding spot-to-spot connectivity. If using an \code{igraph}, it will be
+converted internally to a sparse \code{dgCMatrix}.
+The resulting adjacency must be \code{n_spots x n_spots}, where \code{n_spots = ncol(seurat_obj)}.
+}}
 
-\item{alpha}{Numeric between 0 and 1; weight on propagated vs. raw signal.}
+\item{n_iter}{Integer: the number of propagation iterations to perform. Default is \code{10}.}
 
-\item{n_iter}{Integer; number of diffusion iterations.}
+\item{alpha}{Numeric between 0 and 1: damping factor controlling how much of the neighbor signal is
+retained at each iteration (default = 0.5).}
+}
+\value{
+A numeric vector of length equal to the number of spots. Each element is the propagated
+signal score for the corresponding spot after \code{n_iter} iterations.
 }
 \description{
-Given a Seurat object and a sparse adjacency graph, iteratively diffuse
-raw module scores while re-injecting the original values to preserve local peaks.
+Given an initial signal vector (e.g. gene-module scores or PD1 expression) for each spot and a sparse
+adjacency matrix (or igraph) representing spot-to-spot connections, perform iterative propagation of
+the signal across the spatial graph. This is useful for smoothing a discrete signal over tissue
+architecture in a memory-efficient way.
+}
+\details{
+Internally, this function:
+\enumerate{
+\item Converts an \code{igraph} object to a \code{dgCMatrix} if necessary.
+\item If \code{graph} is any other sparse \code{Matrix} class (e.g. \code{ddiMatrix}), it coerces it to \code{dgCMatrix}.
+\item Normalizes the adjacency matrix row-wise so that each row sums to 1.
+\item Iteratively updates the signal via:
+\preformatted{
+     new_signal <- alpha * (P %*% old_signal) + (1 - alpha) * old_signal
+   }
+until \code{n_iter} steps have been performed.
+}
 }
