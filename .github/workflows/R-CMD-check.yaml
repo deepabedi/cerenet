@@ -24,7 +24,7 @@ jobs:
 
     strategy:
       matrix:
-        r-version: [ "4.1.1", "4.3.3" ]
+        r-version: [ "4.1.1", "4.2.2" ]
 
     steps:
       - uses: actions/checkout@v4
