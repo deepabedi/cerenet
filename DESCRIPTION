@@ -2,13 +2,7 @@ Package: cereNet
 Type: Package
 Title: Cerebellum-Inspired Network Diffusion for Spatial & Single-Cell Omics
 Version: 0.1.2
-Authors@R:
-    person(
-      given  = "Deepa",
-      family = "Bedi",
-      email  = "dbedi@tuskegee.edu",
-      role   = c("aut", "cre")
-    )
+Authors@R: person(given="Deepa", family="Bedi", email="dbedi@tuskegee.edu", role=c("aut","cre"))
 Maintainer: Deepa Bedi <dbedi@tuskegee.edu>
 Description: Iterative reward-injection and multi-signal feedback diffusion on
   arbitrary graphs.
@@ -29,4 +23,3 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 7.3.2
-
