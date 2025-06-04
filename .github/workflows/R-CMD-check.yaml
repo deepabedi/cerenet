@@ -34,7 +34,9 @@ jobs:
             libssl-dev \
             libcurl4-openssl-dev \
             gfortran \
-            build-essential
+            build-essential \
+            libblas-dev \
+            liblapack-dev
 
       - name: (Optional) Set up Bioconductor
         run: |
