@@ -1,2 +1,8 @@
+# Ignore package tarballs and R check folders
+*.tar.gz
+cereNet.Rcheck/
+DESCRIPTION.bak
+
+# (optionally) ignore RStudio project artifacts
 ^.*\.Rproj$
 ^\.Rproj\.user$
